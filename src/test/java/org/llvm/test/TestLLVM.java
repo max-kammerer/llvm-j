@@ -17,15 +17,15 @@ import org.llvm.PassManager;
 
 public class TestLLVM extends TestCase {
 
-	private static final double LLVM_VERSION = 3.1;
+	private static final double LLVM_VERSION = 3.4;
 
 	public void testLLVMSymbols() {
 		NativeLibrary lib = null;
 		try {
 			lib = BridJ.getNativeLibrary("LLVM-" + LLVM_VERSION);
 		} catch (IOException e) {
-            fail(e.getMessage());
-        }
+			fail(e.getMessage());
+		}
 
 		Collection<Symbol> symbols = lib.getSymbols();
 		Set<Symbol> llvmSymbols = new HashSet<Symbol>(symbols.size());

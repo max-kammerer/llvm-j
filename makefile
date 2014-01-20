@@ -1,11 +1,11 @@
 # Makefile for LLVM-J
 
-LLVM_VERSION=3.1
-JNAERATOR_VERSION=0.11-shaded
+LLVM_VERSION=3.4
+JNAERATOR_VERSION=0.12-SNAPSHOT-20130727
 
 # Path to LLVM such that headers for the C bindings exist
 # in $LLVM_HOME/include/llvm-c/
-LLVM_HOME=/usr/lib/llvm-$(LLVM_VERSION)
+export LLVM_HOME=/usr/
 
 JAVA=java
 
@@ -22,7 +22,7 @@ help:
 	@echo "    llvm     to generate Java bindings to LLVM using JNAerator"
 
 clean:
-	-rm src/main/java/org/llvm/binding/LLVMLibrary.java
+	-rm src/main/java/org/llvm/binding/*.java
 
 llvm: clean src/main/java/org/llvm/binding/LLVMLibrary.java
 
