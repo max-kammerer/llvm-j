@@ -73,11 +73,11 @@ public class TestFactorial extends TestCase {
 		PassManager pass = PassManager.create();
 		engine.addTargetData(pass);
 		pass.addConstantPropagationPass();
-		// pass.addInstructionCombiningPass();
+		pass.addInstructionCombiningPass();
 		pass.addPromoteMemoryToRegisterPass();
 		// pass.addDemoteMemoryToRegisterPass(); // Demotes every possible value to memory
 		pass.addGVNPass();
-		// pass.addCFGSimplificationPass();
+		pass.addCFGSimplificationPass();
 		pass.runForModule(mod);
 		mod.dumpModule();
 

@@ -101,14 +101,11 @@ public class PassManager {
 	 * free<br>
 	 * the module provider.
 	 */
-	public void dispose() {
-		boolean err = LLVMFinalizeFunctionPassManager(this.manager) != 0;
+	public boolean dispose() {
+		boolean res = LLVMFinalizeFunctionPassManager(this.manager) == 1;
 		LLVMDisposePassManager(this.manager);
 		this.manager = null;
-		if (err) {
-			throw new RuntimeException(
-					"error in LLVMFinalizeFunctionPassManager");
-		}
+		return res;
 	}
 
 	/* PassManager */
@@ -116,45 +113,35 @@ public class PassManager {
 
 	/**
 	 * Initializes all of the function passes scheduled in the function pass<br>
-	 * manager. Returns 1 if any of the passes modified the module, 0 otherwise.<br>
+	 * manager. Returns true if any of the passes modified the module, false otherwise.<br>
 	 * 
 	 * @see llvm::FunctionPassManager::doInitialization
 	 */
-	public void initialize() {
-		boolean err = LLVMInitializeFunctionPassManager(this.manager) != 0;
-		if (err) {
-			throw new RuntimeException(
-					"error in LLVMInitializeFunctionPassManager");
-		}
+	public boolean initialize() {
+		return LLVMInitializeFunctionPassManager(this.manager) == 1;
 	}
 
 	/**
 	 * Initializes, executes on the provided module, and finalizes all of the<br>
-	 * passes scheduled in the pass manager. Returns 1 if any of the passes<br>
-	 * modified the module, 0 otherwise.<br>
+	 * passes scheduled in the pass manager. Returns true if any of the passes<br>
+	 * modified the module, false otherwise.<br>
 	 * 
 	 * @see llvm::PassManager::run(Module&)
 	 */
-	public void runForModule(Module m) {
-		boolean err = LLVMRunPassManager(this.manager, m.module()) != 0;
-		if (err) {
-			throw new RuntimeException("error in LLVMRunPassManager");
-		}
+	public boolean runForModule(Module m) {
+		return LLVMRunPassManager(this.manager, m.module()) == 1;
 	}
 
 	/**
 	 * Executes all of the function passes scheduled in the function pass
 	 * manager<br>
-	 * on the provided function. Returns 1 if any of the passes modified the<br>
+	 * on the provided function. Returns true if any of the passes modified the<br>
 	 * function, false otherwise.<br>
 	 * 
 	 * @see llvm::FunctionPassManager::run(Function&)
 	 */
-	public void runForFunction(Value f) {
-		boolean err = LLVMRunFunctionPassManager(this.manager, f.value()) != 0;
-		if (err) {
-			throw new RuntimeException("error in LLVMRunFunctionPassManager");
-		}
+	public boolean runForFunction(Value f) {
+		return LLVMRunFunctionPassManager(this.manager, f.value()) == 1;
 	}
 
 	/* Function Pass Manager */
@@ -169,10 +156,6 @@ public class PassManager {
 	public void addDeadArgEliminationPass() {
 		LLVMAddDeadArgEliminationPass(this.manager);
 	}
-
-	/* public void addDeadTypeEliminationPass() {
-	 * LLVMAddDeadTypeEliminationPass(manager);
-	 * } */
 
 	public void addFunctionAttrsPass() {
 		LLVMAddFunctionAttrsPass(this.manager);
@@ -194,10 +177,6 @@ public class PassManager {
 		LLVMAddIPConstantPropagationPass(this.manager);
 	}
 
-	/* public void addLowerSetJmpPass() {
-	 * LLVMAddLowerSetJmpPass(manager);
-	 * } */
-
 	public void addPruneEHPass() {
 		LLVMAddPruneEHPass(this.manager);
 	}
@@ -209,10 +188,6 @@ public class PassManager {
 	public void addInternalizePass(boolean allButMain) {
 		LLVMAddInternalizePass(this.manager, allButMain ? 1 : 0);
 	}
-
-	/* public void addRaiseAllocationsPass() {
-	 * LLVMAddRaiseAllocationsPass(manager);
-	 * } */
 
 	public void addStripDeadPrototypesPass() {
 		LLVMAddStripDeadPrototypesPass(this.manager);
