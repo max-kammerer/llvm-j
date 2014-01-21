@@ -22,7 +22,8 @@ help:
 	@echo "    llvm     to generate Java bindings to LLVM using JNAerator"
 
 clean:
-	-rm src/main/java/org/llvm/binding/*.java
+	-rm src/main/java/org/llvm/binding/LLVMLibrary.java
+	-rm src/main/java/org/llvm/binding/LLVMMCJITCompilerOptions.java
 
 llvm: clean src/main/java/org/llvm/binding/LLVMLibrary.java
 

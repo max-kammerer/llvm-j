@@ -1,6 +1,7 @@
 package org.llvm.binding;
 import java.util.Collections;
 import java.util.Iterator;
+
 import org.bridj.BridJ;
 import org.bridj.CRuntime;
 import org.bridj.Callback;
@@ -36,9 +37,11 @@ public class LLVMLibrary {
 			this.value = value;
 		}
 		public final long value;
+		@Override
 		public long value() {
 			return this.value;
 		}
+		@Override
 		public Iterator<LLVMVerifierFailureAction > iterator() {
 			return Collections.singleton(this).iterator();
 		}
@@ -78,9 +81,11 @@ public class LLVMLibrary {
 			this.value = value;
 		}
 		public final long value;
+		@Override
 		public long value() {
 			return this.value;
 		}
+		@Override
 		public Iterator<LLVMAttribute > iterator() {
 			return Collections.singleton(this).iterator();
 		}
@@ -162,9 +167,11 @@ public class LLVMLibrary {
 			this.value = value;
 		}
 		public final long value;
+		@Override
 		public long value() {
 			return this.value;
 		}
+		@Override
 		public Iterator<LLVMOpcode > iterator() {
 			return Collections.singleton(this).iterator();
 		}
@@ -210,9 +217,11 @@ public class LLVMLibrary {
 			this.value = value;
 		}
 		public final long value;
+		@Override
 		public long value() {
 			return this.value;
 		}
+		@Override
 		public Iterator<LLVMTypeKind > iterator() {
 			return Collections.singleton(this).iterator();
 		}
@@ -268,9 +277,11 @@ public class LLVMLibrary {
 			this.value = value;
 		}
 		public final long value;
+		@Override
 		public long value() {
 			return this.value;
 		}
+		@Override
 		public Iterator<LLVMLinkage > iterator() {
 			return Collections.singleton(this).iterator();
 		}
@@ -290,9 +301,11 @@ public class LLVMLibrary {
 			this.value = value;
 		}
 		public final long value;
+		@Override
 		public long value() {
 			return this.value;
 		}
+		@Override
 		public Iterator<LLVMVisibility > iterator() {
 			return Collections.singleton(this).iterator();
 		}
@@ -313,9 +326,11 @@ public class LLVMLibrary {
 			this.value = value;
 		}
 		public final long value;
+		@Override
 		public long value() {
 			return this.value;
 		}
+		@Override
 		public Iterator<LLVMCallConv > iterator() {
 			return Collections.singleton(this).iterator();
 		}
@@ -349,9 +364,11 @@ public class LLVMLibrary {
 			this.value = value;
 		}
 		public final long value;
+		@Override
 		public long value() {
 			return this.value;
 		}
+		@Override
 		public Iterator<LLVMIntPredicate > iterator() {
 			return Collections.singleton(this).iterator();
 		}
@@ -397,9 +414,11 @@ public class LLVMLibrary {
 			this.value = value;
 		}
 		public final long value;
+		@Override
 		public long value() {
 			return this.value;
 		}
+		@Override
 		public Iterator<LLVMRealPredicate > iterator() {
 			return Collections.singleton(this).iterator();
 		}
@@ -417,9 +436,11 @@ public class LLVMLibrary {
 			this.value = value;
 		}
 		public final long value;
+		@Override
 		public long value() {
 			return this.value;
 		}
+		@Override
 		public Iterator<LLVMLandingPadClauseTy > iterator() {
 			return Collections.singleton(this).iterator();
 		}
@@ -438,9 +459,11 @@ public class LLVMLibrary {
 			this.value = value;
 		}
 		public final long value;
+		@Override
 		public long value() {
 			return this.value;
 		}
+		@Override
 		public Iterator<LLVMThreadLocalMode > iterator() {
 			return Collections.singleton(this).iterator();
 		}
@@ -497,9 +520,11 @@ public class LLVMLibrary {
 			this.value = value;
 		}
 		public final long value;
+		@Override
 		public long value() {
 			return this.value;
 		}
+		@Override
 		public Iterator<LLVMAtomicOrdering > iterator() {
 			return Collections.singleton(this).iterator();
 		}
@@ -551,9 +576,11 @@ public class LLVMLibrary {
 			this.value = value;
 		}
 		public final long value;
+		@Override
 		public long value() {
 			return this.value;
 		}
+		@Override
 		public Iterator<LLVMAtomicRMWBinOp > iterator() {
 			return Collections.singleton(this).iterator();
 		}
@@ -569,9 +596,11 @@ public class LLVMLibrary {
 			this.value = value;
 		}
 		public final long value;
+		@Override
 		public long value() {
 			return this.value;
 		}
+		@Override
 		public Iterator<LLVMByteOrdering > iterator() {
 			return Collections.singleton(this).iterator();
 		}

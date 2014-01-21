@@ -10,6 +10,7 @@ import org.llvm.GenericValue;
 import org.llvm.LLVMException;
 import org.llvm.Module;
 import org.llvm.PassManager;
+import org.llvm.Target;
 import org.llvm.TypeRef;
 import org.llvm.Value;
 import org.llvm.binding.LLVMLibrary.LLVMCallConv;
@@ -22,7 +23,8 @@ public class TestFactorial extends TestCase {
 
 	public void testFactorial() {
 		LLVMLinkInJIT();
-		// LLVMInitializeNativeTarget();
+		Target.initialiseNativeTarget();
+
 		Module mod = Module.createWithName("fac_module");
 		Value fac = mod.addFunction("fac",
 				TypeRef.functionType(TypeRef.int32Type(), TypeRef.int32Type()));
@@ -65,7 +67,9 @@ public class TestFactorial extends TestCase {
 		ExecutionEngine engine = ExecutionEngine.createForModule(mod);
 		try {
 			mod.verify();
-			//engine.createJITCompilerForModule(mod, 2);  FIXME: requires LLVMInitializeNativeTarget() call
+
+			/* Requires that the native JIT target was initialised beforehand. */
+			engine.createJITCompilerForModule(mod, 2);
 		} catch (LLVMException e) {
 			fail(e.getMessage());
 		}
