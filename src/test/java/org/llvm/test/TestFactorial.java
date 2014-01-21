@@ -1,6 +1,5 @@
 package org.llvm.test;
 
-import static org.llvm.binding.LLVMLibrary.LLVMLinkInJIT;
 import junit.framework.TestCase;
 
 import org.llvm.BasicBlock;
@@ -17,15 +16,11 @@ import org.llvm.binding.LLVMLibrary.LLVMCallConv;
 import org.llvm.binding.LLVMLibrary.LLVMIntPredicate;
 
 /**
- * https://github.com/wickedchicken/llvm-c-example
+ * Adapted from https://github.com/wickedchicken/llvm-c-example
  */
 public class TestFactorial extends TestCase {
 
-	public void testFactorial() {
-		LLVMLinkInJIT();
-		Target.initialiseNativeTarget();
-
-		Module mod = Module.createWithName("fac_module");
+	public Value addFunction(Module mod) {
 		Value fac = mod.addFunction("fac",
 				TypeRef.functionType(TypeRef.int32Type(), TypeRef.int32Type()));
 		fac.setFunctionCallConv(LLVMCallConv.LLVMCCallConv);
@@ -35,6 +30,7 @@ public class TestFactorial extends TestCase {
 		BasicBlock iftrue = fac.appendBasicBlock("iftrue");
 		BasicBlock iffalse = fac.appendBasicBlock("iffalse");
 		BasicBlock end = fac.appendBasicBlock("end");
+
 		Builder builder = Builder.createBuilder();
 
 		builder.positionBuilderAtEnd(entry);
@@ -64,26 +60,40 @@ public class TestFactorial extends TestCase {
 		res.addIncoming(phi_vals, phi_blocks, 2);
 		builder.buildRet(res);
 
-		ExecutionEngine engine = ExecutionEngine.createForModule(mod);
+		return fac;
+	}
+
+	public void testFactorial() {
+		ExecutionEngine.linkInJIT();
+		Target.initialiseNativeTarget();
+
+		Module module = Module.createWithName("fac_module");
+		Value fac = this.addFunction(module);
+
+		ExecutionEngine engine = ExecutionEngine.createForModule(module);
+
 		try {
-			mod.verify();
+			module.verify();
 
 			/* Requires that the native JIT target was initialised beforehand. */
-			engine.createJITCompilerForModule(mod, 2);
+			engine.createJITCompilerForModule(module, 2);
 		} catch (LLVMException e) {
 			fail(e.getMessage());
 		}
 
 		PassManager pass = PassManager.create();
 		engine.addTargetData(pass);
+
 		pass.addConstantPropagationPass();
 		pass.addInstructionCombiningPass();
 		pass.addPromoteMemoryToRegisterPass();
 		// pass.addDemoteMemoryToRegisterPass(); // Demotes every possible value to memory
 		pass.addGVNPass();
 		pass.addCFGSimplificationPass();
-		pass.runForModule(mod);
-		mod.dumpModule();
+
+		pass.runForModule(module);
+
+		module.dumpModule();
 
 		GenericValue exec_res = engine.runFunction(fac,
 				GenericValue.createInt(TypeRef.int32Type(), 6, false));

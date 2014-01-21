@@ -12,6 +12,7 @@ import static org.llvm.binding.LLVMLibrary.LLVMFindFunction;
 import static org.llvm.binding.LLVMLibrary.LLVMFreeMachineCodeForFunction;
 import static org.llvm.binding.LLVMLibrary.LLVMGetExecutionEngineTargetData;
 import static org.llvm.binding.LLVMLibrary.LLVMGetPointerToGlobal;
+import static org.llvm.binding.LLVMLibrary.LLVMLinkInJIT;
 import static org.llvm.binding.LLVMLibrary.LLVMRecompileAndRelinkFunction;
 import static org.llvm.binding.LLVMLibrary.LLVMRemoveModule;
 import static org.llvm.binding.LLVMLibrary.LLVMRemoveModuleProvider;
@@ -32,6 +33,10 @@ import org.llvm.binding.LLVMLibrary.LLVMValueRef;
  * Implements various analyses of the LLVM IR.
  */
 public class ExecutionEngine {
+
+	public static void linkInJIT() {
+		LLVMLinkInJIT();
+	}
 
 	private final LLVMExecutionEngineRef engine;
 
