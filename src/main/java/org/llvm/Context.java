@@ -61,6 +61,7 @@ public class Context {
 		if (this.context != null) {
 			LLVMContextDispose(this.context);
 		}
+
 		this.context = null;
 	}
 

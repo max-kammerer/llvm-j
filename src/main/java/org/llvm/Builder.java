@@ -4,13 +4,13 @@ import static org.llvm.binding.LLVMLibrary.*;
 
 import org.bridj.IntValuedEnum;
 import org.bridj.Pointer;
-import org.llvm.binding.LLVMLibrary.LLVMBasicBlockRef;
 import org.llvm.binding.LLVMLibrary.LLVMBuilderRef;
 import org.llvm.binding.LLVMLibrary.LLVMIntPredicate;
 import org.llvm.binding.LLVMLibrary.LLVMOpcode;
 import org.llvm.binding.LLVMLibrary.LLVMRealPredicate;
-import org.llvm.binding.LLVMLibrary.LLVMTypeRef;
 import org.llvm.binding.LLVMLibrary.LLVMValueRef;
+
+import java.util.List;
 
 /**
  * This provides a uniform API for creating instructions and inserting them into
@@ -21,6 +21,7 @@ public class Builder {
 	private LLVMBuilderRef builder;
 
 	LLVMBuilderRef builder() {
+		Class x = LLVMBuilderRef.class;
 		return this.builder;
 	}
 
@@ -105,17 +106,8 @@ public class Builder {
 		return new Value(LLVMBuildAggregateRet(this.builder, retVals, n));
 	}
 
-	public Value buildBr(LLVMBasicBlockRef dest) {
-		return new Value(LLVMBuildBr(this.builder, dest));
-	}
-
 	public Value buildBr(BasicBlock dest) {
 		return new Value(LLVMBuildBr(this.builder, dest.bb()));
-	}
-
-	public Value buildCondBr(Value if_, LLVMBasicBlockRef then,
-			LLVMBasicBlockRef else_) {
-		return new Value(LLVMBuildCondBr(this.builder, if_.value(), then, else_));
 	}
 
 	public Value buildCondBr(Value if_, BasicBlock then, BasicBlock else_) {
@@ -123,18 +115,21 @@ public class Builder {
 				else_.bb()));
 	}
 
-	public Value buildSwitch(Value v, LLVMBasicBlockRef else_, int numCases) {
-		return new Value(LLVMBuildSwitch(this.builder, v.value(), else_, numCases));
+	public Value buildSwitch(Value v, BasicBlock else_, int numCases) {
+		return new Value(LLVMBuildSwitch(this.builder, v.value(), else_.bb(),
+				numCases));
 	}
 
 	public Value buildIndirectBr(Value addr, int numDests) {
-		return new Value(LLVMBuildIndirectBr(this.builder, addr.value(), numDests));
+		return new Value(LLVMBuildIndirectBr(this.builder, addr.value(),
+				numDests));
 	}
 
-	public Value buildInvoke(Value fn, Pointer<LLVMValueRef> args, int numArgs,
-			LLVMBasicBlockRef then, LLVMBasicBlockRef catch_, String name) {
-		return new Value(LLVMBuildInvoke(this.builder, fn.value(), args, numArgs,
-				then, catch_, Pointer.pointerToCString(name)));
+	public Value buildInvoke(Value fn, List<Value> args, BasicBlock then,
+			BasicBlock catch_, String name) {
+		return new Value(LLVMBuildInvoke(this.builder, fn.value(),
+				Value.internalize(args), args.size(), then.bb(), catch_.bb(),
+				Pointer.pointerToCString(name)));
 	}
 
 	/* public Value buildUnwind() {
@@ -150,15 +145,15 @@ public class Builder {
 	/**
 	 * Add a case to the switch instruction
 	 */
-	public void addCase(Value switch_, Value onVal, LLVMBasicBlockRef dest) {
-		LLVMAddCase(switch_.value(), onVal.value(), dest);
+	public void addCase(Value switch_, Value onVal, BasicBlock dest) {
+		LLVMAddCase(switch_.value(), onVal.value(), dest.bb());
 	}
 
 	/**
 	 * Add a destination to the indirectbr instruction
 	 */
-	public void addDestination(Value indirectBr, LLVMBasicBlockRef dest) {
-		LLVMAddDestination(indirectBr.value(), dest);
+	public void addDestination(Value indirectBr, BasicBlock dest) {
+		LLVMAddDestination(indirectBr.value(), dest.bb());
 	}
 
 	public Value buildAdd(Value lhs, Value rhs, String name) {
@@ -167,13 +162,13 @@ public class Builder {
 	}
 
 	public Value buildNSWAdd(Value lhs, Value rhs, String name) {
-		return new Value(LLVMBuildNSWAdd(this.builder, lhs.value(), rhs.value(),
-				Pointer.pointerToCString(name)));
+		return new Value(LLVMBuildNSWAdd(this.builder, lhs.value(),
+				rhs.value(), Pointer.pointerToCString(name)));
 	}
 
 	public Value buildNUWAdd(Value lhs, Value rhs, String name) {
-		return new Value(LLVMBuildNUWAdd(this.builder, lhs.value(), rhs.value(),
-				Pointer.pointerToCString(name)));
+		return new Value(LLVMBuildNUWAdd(this.builder, lhs.value(),
+				rhs.value(), Pointer.pointerToCString(name)));
 	}
 
 	public Value buildFAdd(Value lhs, Value rhs, String name) {
@@ -187,13 +182,13 @@ public class Builder {
 	}
 
 	public Value buildNSWSub(Value lhs, Value rhs, String name) {
-		return new Value(LLVMBuildNSWSub(this.builder, lhs.value(), rhs.value(),
-				Pointer.pointerToCString(name)));
+		return new Value(LLVMBuildNSWSub(this.builder, lhs.value(),
+				rhs.value(), Pointer.pointerToCString(name)));
 	}
 
 	public Value buildNUWSub(Value lhs, Value rhs, String name) {
-		return new Value(LLVMBuildNUWSub(this.builder, lhs.value(), rhs.value(),
-				Pointer.pointerToCString(name)));
+		return new Value(LLVMBuildNUWSub(this.builder, lhs.value(),
+				rhs.value(), Pointer.pointerToCString(name)));
 	}
 
 	public Value buildFSub(Value lhs, Value rhs, String name) {
@@ -207,13 +202,13 @@ public class Builder {
 	}
 
 	public Value buildNSWMul(Value lhs, Value rhs, String name) {
-		return new Value(LLVMBuildNSWMul(this.builder, lhs.value(), rhs.value(),
-				Pointer.pointerToCString(name)));
+		return new Value(LLVMBuildNSWMul(this.builder, lhs.value(),
+				rhs.value(), Pointer.pointerToCString(name)));
 	}
 
 	public Value buildNUWMul(Value lhs, Value rhs, String name) {
-		return new Value(LLVMBuildNUWMul(this.builder, lhs.value(), rhs.value(),
-				Pointer.pointerToCString(name)));
+		return new Value(LLVMBuildNUWMul(this.builder, lhs.value(),
+				rhs.value(), Pointer.pointerToCString(name)));
 	}
 
 	public Value buildFMul(Value lhs, Value rhs, String name) {
@@ -232,8 +227,8 @@ public class Builder {
 	}
 
 	public Value buildExactSDiv(Value lhs, Value rhs, String name) {
-		return new Value(LLVMBuildExactSDiv(this.builder, lhs.value(), rhs.value(),
-				Pointer.pointerToCString(name)));
+		return new Value(LLVMBuildExactSDiv(this.builder, lhs.value(),
+				rhs.value(), Pointer.pointerToCString(name)));
 	}
 
 	public Value buildFDiv(Value lhs, Value rhs, String name) {
@@ -288,8 +283,8 @@ public class Builder {
 
 	public Value buildBinOp(IntValuedEnum<LLVMOpcode> op, Value lhs, Value rhs,
 			String name) {
-		return new Value(LLVMBuildBinOp(this.builder, op, lhs.value(), rhs.value(),
-				Pointer.pointerToCString(name)));
+		return new Value(LLVMBuildBinOp(this.builder, op, lhs.value(),
+				rhs.value(), Pointer.pointerToCString(name)));
 	}
 
 	public Value buildNeg(Value v, String name) {
@@ -317,24 +312,24 @@ public class Builder {
 				Pointer.pointerToCString(name)));
 	}
 
-	public Value buildMalloc(LLVMTypeRef ty, String name) {
-		return new Value(LLVMBuildMalloc(this.builder, ty,
+	public Value buildMalloc(TypeRef ty, String name) {
+		return new Value(LLVMBuildMalloc(this.builder, ty.type(),
 				Pointer.pointerToCString(name)));
 	}
 
-	public Value buildArrayMalloc(LLVMTypeRef ty, Value val, String name) {
-		return new Value(LLVMBuildArrayMalloc(this.builder, ty, val.value(),
+	public Value buildArrayMalloc(TypeRef ty, Value val, String name) {
+		return new Value(LLVMBuildArrayMalloc(this.builder, ty.type(),
+				val.value(), Pointer.pointerToCString(name)));
+	}
+
+	public Value buildAlloca(TypeRef ty, String name) {
+		return new Value(LLVMBuildAlloca(this.builder, ty.type(),
 				Pointer.pointerToCString(name)));
 	}
 
-	public Value buildAlloca(LLVMTypeRef ty, String name) {
-		return new Value(LLVMBuildAlloca(this.builder, ty,
-				Pointer.pointerToCString(name)));
-	}
-
-	public Value buildArrayAlloca(LLVMTypeRef ty, Value val, String name) {
-		return new Value(LLVMBuildArrayAlloca(this.builder, ty, val.value(),
-				Pointer.pointerToCString(name)));
+	public Value buildArrayAlloca(TypeRef ty, Value val, String name) {
+		return new Value(LLVMBuildArrayAlloca(this.builder, ty.type(),
+				val.value(), Pointer.pointerToCString(name)));
 	}
 
 	public Value buildFree(Value pointerVal) {
@@ -350,6 +345,22 @@ public class Builder {
 		return new Value(LLVMBuildStore(this.builder, val.value(), ptr.value()));
 	}
 
+	public Value buildGEP(Value ptr, List<Integer> indices) {
+		Pointer ptrIndices = Pointer.allocateTypedPointers(LLVMValueRef.class,
+				indices.size());
+
+		int i = 0;
+		for (Integer index : indices) {
+			LLVMValueRef valueRef = TypeRef.int32Type().constInt(index, false)
+					.value();
+			ptrIndices.set(i, valueRef);
+			i++;
+		}
+
+		return new Value(LLVMBuildGEP(this.builder, ptr.value(), ptrIndices,
+				indices.size(), Pointer.pointerToCString("")));
+	}
+
 	public Value buildGEP(Value ptr, Pointer<LLVMValueRef> indices,
 			int numIndices, String name) {
 		return new Value(LLVMBuildGEP(this.builder, ptr.value(), indices,
@@ -358,8 +369,8 @@ public class Builder {
 
 	public Value buildInBoundsGEP(Value ptr, Pointer<LLVMValueRef> indices,
 			int numIndices, String name) {
-		return new Value(LLVMBuildInBoundsGEP(this.builder, ptr.value(), indices,
-				numIndices, Pointer.pointerToCString(name)));
+		return new Value(LLVMBuildInBoundsGEP(this.builder, ptr.value(),
+				indices, numIndices, Pointer.pointerToCString(name)));
 	}
 
 	public Value buildInBoundsGEP(Value ptr, String name, Value... indices) {
@@ -383,130 +394,119 @@ public class Builder {
 				Pointer.pointerToCString(str), Pointer.pointerToCString(name)));
 	}
 
-	public Value buildTrunc(Value val, LLVMTypeRef destTy, String name) {
-		return new Value(LLVMBuildTrunc(this.builder, val.value(), destTy,
-				Pointer.pointerToCString(name)));
+	public Value buildTrunc(Value val, TypeRef destTy, String name) {
+		return new Value(LLVMBuildTrunc(this.builder, val.value(),
+				destTy.type(), Pointer.pointerToCString(name)));
 	}
 
-	public Value buildZExt(Value val, LLVMTypeRef destTy, String name) {
-		return new Value(LLVMBuildZExt(this.builder, val.value(), destTy,
-				Pointer.pointerToCString(name)));
+	public Value buildZExt(Value val, TypeRef destTy, String name) {
+		return new Value(LLVMBuildZExt(this.builder, val.value(),
+				destTy.type(), Pointer.pointerToCString(name)));
 	}
 
-	public Value buildSExt(Value val, LLVMTypeRef destTy, String name) {
-		return new Value(LLVMBuildSExt(this.builder, val.value(), destTy,
-				Pointer.pointerToCString(name)));
+	public Value buildSExt(Value val, TypeRef destTy, String name) {
+		return new Value(LLVMBuildSExt(this.builder, val.value(),
+				destTy.type(), Pointer.pointerToCString(name)));
 	}
 
-	public Value buildFPToUI(Value val, LLVMTypeRef destTy, String name) {
-		return new Value(LLVMBuildFPToUI(this.builder, val.value(), destTy,
-				Pointer.pointerToCString(name)));
+	public Value buildFPToUI(Value val, TypeRef destTy, String name) {
+		return new Value(LLVMBuildFPToUI(this.builder, val.value(),
+				destTy.type(), Pointer.pointerToCString(name)));
 	}
 
-	public Value buildFPToSI(Value val, LLVMTypeRef destTy, String name) {
-		return new Value(LLVMBuildFPToSI(this.builder, val.value(), destTy,
-				Pointer.pointerToCString(name)));
+	public Value buildFPToSI(Value val, TypeRef destTy, String name) {
+		return new Value(LLVMBuildFPToSI(this.builder, val.value(),
+				destTy.type(), Pointer.pointerToCString(name)));
 	}
 
-	public Value buildUIToFP(Value val, LLVMTypeRef destTy, String name) {
-		return new Value(LLVMBuildUIToFP(this.builder, val.value(), destTy,
-				Pointer.pointerToCString(name)));
+	public Value buildUIToFP(Value val, TypeRef destTy, String name) {
+		return new Value(LLVMBuildUIToFP(this.builder, val.value(),
+				destTy.type(), Pointer.pointerToCString(name)));
 	}
 
-	public Value buildSIToFP(Value val, LLVMTypeRef destTy, String name) {
-		return new Value(LLVMBuildSIToFP(this.builder, val.value(), destTy,
-				Pointer.pointerToCString(name)));
+	public Value buildSIToFP(Value val, TypeRef destTy, String name) {
+		return new Value(LLVMBuildSIToFP(this.builder, val.value(),
+				destTy.type(), Pointer.pointerToCString(name)));
 	}
 
-	public Value buildFPTrunc(Value val, LLVMTypeRef destTy, String name) {
-		return new Value(LLVMBuildFPTrunc(this.builder, val.value(), destTy,
-				Pointer.pointerToCString(name)));
+	public Value buildFPTrunc(Value val, TypeRef destTy, String name) {
+		return new Value(LLVMBuildFPTrunc(this.builder, val.value(),
+				destTy.type(), Pointer.pointerToCString(name)));
 	}
 
-	public Value buildFPExt(Value val, LLVMTypeRef destTy, String name) {
-		return new Value(LLVMBuildFPExt(this.builder, val.value(), destTy,
-				Pointer.pointerToCString(name)));
+	public Value buildFPExt(Value val, TypeRef destTy, String name) {
+		return new Value(LLVMBuildFPExt(this.builder, val.value(),
+				destTy.type(), Pointer.pointerToCString(name)));
 	}
 
-	public Value buildPtrToInt(Value val, LLVMTypeRef destTy, String name) {
-		return new Value(LLVMBuildPtrToInt(this.builder, val.value(), destTy,
-				Pointer.pointerToCString(name)));
+	public Value buildPtrToInt(Value val, TypeRef destTy, String name) {
+		return new Value(LLVMBuildPtrToInt(this.builder, val.value(),
+				destTy.type(), Pointer.pointerToCString(name)));
 	}
 
-	public Value buildIntToPtr(Value val, LLVMTypeRef destTy, String name) {
-		return new Value(LLVMBuildIntToPtr(this.builder, val.value(), destTy,
-				Pointer.pointerToCString(name)));
+	public Value buildIntToPtr(Value val, TypeRef destTy, String name) {
+		return new Value(LLVMBuildIntToPtr(this.builder, val.value(),
+				destTy.type(), Pointer.pointerToCString(name)));
 	}
 
-	public Value buildBitCast(Value val, LLVMTypeRef destTy, String name) {
-		return new Value(LLVMBuildBitCast(this.builder, val.value(), destTy,
-				Pointer.pointerToCString(name)));
+	public Value buildBitCast(Value val, TypeRef destTy, String name) {
+		return new Value(LLVMBuildBitCast(this.builder, val.value(),
+				destTy.type(), Pointer.pointerToCString(name)));
 	}
 
-	public Value buildZExtOrBitCast(Value val, LLVMTypeRef destTy, String name) {
-		return new Value(LLVMBuildZExtOrBitCast(this.builder, val.value(), destTy,
-				Pointer.pointerToCString(name)));
+	public Value buildZExtOrBitCast(Value val, TypeRef destTy, String name) {
+		return new Value(LLVMBuildZExtOrBitCast(this.builder, val.value(),
+				destTy.type(), Pointer.pointerToCString(name)));
 	}
 
-	public Value buildSExtOrBitCast(Value val, LLVMTypeRef destTy, String name) {
-		return new Value(LLVMBuildSExtOrBitCast(this.builder, val.value(), destTy,
-				Pointer.pointerToCString(name)));
+	public Value buildSExtOrBitCast(Value val, TypeRef destTy, String name) {
+		return new Value(LLVMBuildSExtOrBitCast(this.builder, val.value(),
+				destTy.type(), Pointer.pointerToCString(name)));
 	}
 
-	public Value buildTruncOrBitCast(Value val, LLVMTypeRef destTy, String name) {
-		return new Value(LLVMBuildTruncOrBitCast(this.builder, val.value(), destTy,
-				Pointer.pointerToCString(name)));
+	public Value buildTruncOrBitCast(Value val, TypeRef destTy, String name) {
+		return new Value(LLVMBuildTruncOrBitCast(this.builder, val.value(),
+				destTy.type(), Pointer.pointerToCString(name)));
 	}
 
 	public Value buildCast(IntValuedEnum<LLVMOpcode> op, Value val,
-			LLVMTypeRef destTy, String name) {
-		return new Value(LLVMBuildCast(this.builder, op, val.value(), destTy,
-				Pointer.pointerToCString(name)));
+			TypeRef destTy, String name) {
+		return new Value(LLVMBuildCast(this.builder, op, val.value(),
+				destTy.type(), Pointer.pointerToCString(name)));
 	}
 
-	public Value buildPointerCast(Value val, LLVMTypeRef destTy, String name) {
-		return new Value(LLVMBuildPointerCast(this.builder, val.value(), destTy,
-				Pointer.pointerToCString(name)));
+	public Value buildPointerCast(Value val, TypeRef destTy, String name) {
+		return new Value(LLVMBuildPointerCast(this.builder, val.value(),
+				destTy.type(), Pointer.pointerToCString(name)));
 	}
 
 	/**
 	 * Signed cast.
 	 */
-	public Value buildIntCast(Value val, LLVMTypeRef destTy, String name) {
-		return new Value(LLVMBuildIntCast(this.builder, val.value(), destTy,
-				Pointer.pointerToCString(name)));
+	public Value buildIntCast(Value val, TypeRef destTy, String name) {
+		return new Value(LLVMBuildIntCast(this.builder, val.value(),
+				destTy.type(), Pointer.pointerToCString(name)));
 	}
 
-	public Value buildFPCast(Value val, LLVMTypeRef destTy, String name) {
-		return new Value(LLVMBuildFPCast(this.builder, val.value(), destTy,
-				Pointer.pointerToCString(name)));
+	public Value buildFPCast(Value val, TypeRef destTy, String name) {
+		return new Value(LLVMBuildFPCast(this.builder, val.value(),
+				destTy.type(), Pointer.pointerToCString(name)));
 	}
 
 	public Value buildICmp(IntValuedEnum<LLVMIntPredicate> op, Value lhs,
 			Value rhs, String name) {
-		return new Value(LLVMBuildICmp(this.builder, op, lhs.value(), rhs.value(),
-				Pointer.pointerToCString(name)));
+		return new Value(LLVMBuildICmp(this.builder, op, lhs.value(),
+				rhs.value(), Pointer.pointerToCString(name)));
 	}
 
 	public Value buildFCmp(IntValuedEnum<LLVMRealPredicate> op, Value lhs,
 			Value rhs, String name) {
-		return new Value(LLVMBuildFCmp(this.builder, op, lhs.value(), rhs.value(),
-				Pointer.pointerToCString(name)));
-	}
-
-	public Value buildPhi(LLVMTypeRef ty, String name) {
-		return new Value(LLVMBuildPhi(this.builder, ty,
-				Pointer.pointerToCString(name)));
+		return new Value(LLVMBuildFCmp(this.builder, op, lhs.value(),
+				rhs.value(), Pointer.pointerToCString(name)));
 	}
 
 	public Value buildPhi(TypeRef ty, String name) {
 		return new Value(LLVMBuildPhi(this.builder, ty.type(),
-				Pointer.pointerToCString(name)));
-	}
-
-	public Value buildCall(Value fn, Pointer<LLVMValueRef> args, int numArgs,
-			String name) {
-		return new Value(LLVMBuildCall(this.builder, fn.value(), args, numArgs,
 				Pointer.pointerToCString(name)));
 	}
 
@@ -516,13 +516,19 @@ public class Builder {
 				Pointer.pointerToCString(name)));
 	}
 
-	public Value buildSelect(Value if_, Value then, Value else_, String name) {
-		return new Value(LLVMBuildSelect(this.builder, if_.value(), then.value(),
-				else_.value(), Pointer.pointerToCString(name)));
+	public Value buildCall(Value fn, String name, List<Value> args) {
+		return new Value(LLVMBuildCall(this.builder, fn.value(),
+				Value.internalize(args), args.size(),
+				Pointer.pointerToCString(name)));
 	}
 
-	public Value buildVAArg(Value list, LLVMTypeRef ty, String name) {
-		return new Value(LLVMBuildVAArg(this.builder, list.value(), ty,
+	public Value buildSelect(Value if_, Value then, Value else_, String name) {
+		return new Value(LLVMBuildSelect(this.builder, if_.value(),
+				then.value(), else_.value(), Pointer.pointerToCString(name)));
+	}
+
+	public Value buildVAArg(Value list, TypeRef ty, String name) {
+		return new Value(LLVMBuildVAArg(this.builder, list.value(), ty.type(),
 				Pointer.pointerToCString(name)));
 	}
 
@@ -543,8 +549,8 @@ public class Builder {
 	}
 
 	public Value buildExtractValue(Value aggVal, int index, String name) {
-		return new Value(LLVMBuildExtractValue(this.builder, aggVal.value(), index,
-				Pointer.pointerToCString(name)));
+		return new Value(LLVMBuildExtractValue(this.builder, aggVal.value(),
+				index, Pointer.pointerToCString(name)));
 	}
 
 	public Value buildInsertValue(Value aggVal, Value eltVal, int index,
@@ -564,8 +570,20 @@ public class Builder {
 	}
 
 	public Value buildPtrDiff(Value lhs, Value rhs, String name) {
-		return new Value(LLVMBuildPtrDiff(this.builder, lhs.value(), rhs.value(),
-				Pointer.pointerToCString(name)));
+		return new Value(LLVMBuildPtrDiff(this.builder, lhs.value(),
+				rhs.value(), Pointer.pointerToCString(name)));
+	}
+
+	public Value buildLandingPad(TypeRef type, Value personality,
+			int numClauses, String name) {
+		return new Value(
+				LLVMBuildLandingPad(this.builder, type.type(),
+						personality.value(), numClauses,
+						Pointer.pointerToCString(name)));
+	}
+
+	public Value buildResume(Value exn) {
+		return new Value(LLVMBuildResume(this.builder, exn.value()));
 	}
 
 }

@@ -62,9 +62,7 @@ public class PassManager {
 
 	/**
 	 * Constructs a new whole-module pass pipeline. This type of pipeline is<br>
-	 * suitable for link-time optimization and whole-module transformations.<br>
-	 * 
-	 * @see llvm::PassManager::PassManager
+	 * suitable for link-time optimization and whole-module transformations.
 	 */
 	public static PassManager create() {
 		return new PassManager(LLVMCreatePassManager());
@@ -73,9 +71,7 @@ public class PassManager {
 	/**
 	 * Constructs a new function-by-function pass pipeline over the module<br>
 	 * provider. It does not take ownership of the module provider. This type of<br>
-	 * pipeline is suitable for code generation and JIT compilation tasks.<br>
-	 * 
-	 * @see llvm::FunctionPassManager::FunctionPassManager
+	 * pipeline is suitable for code generation and JIT compilation tasks.
 	 */
 	public static PassManager createForModule(Module m) {
 		return new PassManager(
@@ -113,9 +109,7 @@ public class PassManager {
 
 	/**
 	 * Initializes all of the function passes scheduled in the function pass<br>
-	 * manager. Returns true if any of the passes modified the module, false otherwise.<br>
-	 * 
-	 * @see llvm::FunctionPassManager::doInitialization
+	 * manager. Returns true if any of the passes modified the module, false otherwise.
 	 */
 	public boolean initialize() {
 		return LLVMInitializeFunctionPassManager(this.manager) == 1;
@@ -124,9 +118,7 @@ public class PassManager {
 	/**
 	 * Initializes, executes on the provided module, and finalizes all of the<br>
 	 * passes scheduled in the pass manager. Returns true if any of the passes<br>
-	 * modified the module, false otherwise.<br>
-	 * 
-	 * @see llvm::PassManager::run(Module&)
+	 * modified the module, false otherwise.
 	 */
 	public boolean runForModule(Module m) {
 		return LLVMRunPassManager(this.manager, m.module()) == 1;
@@ -136,9 +128,7 @@ public class PassManager {
 	 * Executes all of the function passes scheduled in the function pass
 	 * manager<br>
 	 * on the provided function. Returns true if any of the passes modified the<br>
-	 * function, false otherwise.<br>
-	 * 
-	 * @see llvm::FunctionPassManager::run(Function&)
+	 * function, false otherwise.
 	 */
 	public boolean runForFunction(Value f) {
 		return LLVMRunFunctionPassManager(this.manager, f.value()) == 1;

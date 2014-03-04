@@ -1,35 +1,9 @@
 package org.llvm;
 
-import static org.llvm.binding.LLVMLibrary.LLVMAddAlias;
-import static org.llvm.binding.LLVMLibrary.LLVMAddFunction;
-import static org.llvm.binding.LLVMLibrary.LLVMAddGlobal;
-import static org.llvm.binding.LLVMLibrary.LLVMAddGlobalInAddressSpace;
-import static org.llvm.binding.LLVMLibrary.LLVMDisposeMessage;
-import static org.llvm.binding.LLVMLibrary.LLVMDisposeModule;
-import static org.llvm.binding.LLVMLibrary.LLVMDumpModule;
-import static org.llvm.binding.LLVMLibrary.LLVMGetDataLayout;
-import static org.llvm.binding.LLVMLibrary.LLVMGetFirstFunction;
-import static org.llvm.binding.LLVMLibrary.LLVMGetFirstGlobal;
-import static org.llvm.binding.LLVMLibrary.LLVMGetLastFunction;
-import static org.llvm.binding.LLVMLibrary.LLVMGetLastGlobal;
-import static org.llvm.binding.LLVMLibrary.LLVMGetNamedFunction;
-import static org.llvm.binding.LLVMLibrary.LLVMGetNamedGlobal;
-import static org.llvm.binding.LLVMLibrary.LLVMGetTarget;
-import static org.llvm.binding.LLVMLibrary.LLVMGetTypeByName;
-import static org.llvm.binding.LLVMLibrary.LLVMModuleCreateWithName;
-import static org.llvm.binding.LLVMLibrary.LLVMModuleCreateWithNameInContext;
-import static org.llvm.binding.LLVMLibrary.LLVMSetDataLayout;
-import static org.llvm.binding.LLVMLibrary.LLVMSetModuleInlineAsm;
-import static org.llvm.binding.LLVMLibrary.LLVMSetTarget;
-import static org.llvm.binding.LLVMLibrary.LLVMVerifyModule;
-import static org.llvm.binding.LLVMLibrary.LLVMWriteBitcodeToFile;
-
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.bridj.Pointer;
-import org.llvm.binding.LLVMLibrary.LLVMModuleRef;
-import org.llvm.binding.LLVMLibrary.LLVMTypeRef;
-import org.llvm.binding.LLVMLibrary.LLVMVerifierFailureAction;
+import static org.llvm.binding.LLVMLibrary.*;
 
 /**
  * The main container class for the LLVM Intermediate Representation.
@@ -38,11 +12,11 @@ public class Module {
 
 	private LLVMModuleRef module;
 
-	LLVMModuleRef module() {
+	public LLVMModuleRef module() {
 		return this.module;
 	}
 
-	Module(LLVMModuleRef module) {
+	public Module(LLVMModuleRef module) {
 		this.module = module;
 	}
 
@@ -75,7 +49,7 @@ public class Module {
 
 	/**
 	 * Destroy a module instance.<br>
-	 * * This must be called for every created module or memory will be<br>
+	 * This must be called for every created module or memory will be<br>
 	 * leaked.
 	 */
 	public void dispose() {
@@ -155,7 +129,6 @@ public class Module {
 	 * Obtain a Type from a module by its registered name.
 	 */
 	public TypeRef getTypeByName(String name) {
-		//Pointer<Byte> cstr = Pointer.pointerToCString(name);
 		return new TypeRef(LLVMGetTypeByName(this.module,
 				Pointer.pointerToCString(name)));
 	}
@@ -178,7 +151,8 @@ public class Module {
 	 * Writes a module to the specified path. Returns 0 on success.
 	 */
 	public int writeBitcodeToFile(String path) {
-		return LLVMWriteBitcodeToFile(this.module, Pointer.pointerToCString(path));
+		return LLVMWriteBitcodeToFile(this.module,
+				Pointer.pointerToCString(path));
 	}
 
 	/**
@@ -225,13 +199,21 @@ public class Module {
 	}
 
 	/**
-	 * Add a function to a module under a specified name.<br>
+	 * Add a function to a module under a specified name.
 	 * 
 	 * @see llvm::Function::Create()
 	 */
 	public Value addFunction(String name, TypeRef functionTy) {
 		return new Value(LLVMAddFunction(this.module,
 				Pointer.pointerToCString(name), functionTy.type()));
+	}
+
+	public Value addOrInsertFunction(String name, TypeRef functionTy) {
+		try {
+			return this.getNamedFunction(name);
+		} catch (LLVMException e) {
+			return this.addFunction(name, functionTy);
+		}
 	}
 
 	public Value addFunction(String name, LLVMTypeRef functionTy) {
@@ -241,31 +223,45 @@ public class Module {
 
 	/**
 	 * Obtain a Function value from a Module by its name.<br>
-	 * The returned value corresponds to a llvm::Function value.<br>
+	 * The returned value corresponds to a llvm::Function value.
 	 * 
 	 * @see llvm::Module::getFunction()
 	 */
-	public Value getNamedFunction(String name) {
-		return new Value(LLVMGetNamedFunction(this.module,
-				Pointer.pointerToCString(name)));
+	public Value getNamedFunction(String name) throws LLVMException {
+		try {
+			return new Value(LLVMGetNamedFunction(this.module,
+					Pointer.pointerToCString(name)));
+		} catch (IllegalArgumentException e) {
+			throw new LLVMException("Function '" + name + "' not found.");
+		}
 	}
 
 	/**
-	 * Obtain an iterator to the first Function in a Module.<br>
+	 * Obtain an iterator to the first Function in a Module.
 	 * 
 	 * @see llvm::Module::begin()
 	 */
-	public Value getFirstFunction() {
-		return new Value(LLVMGetFirstFunction(this.module));
+	public Value getFirstFunction() throws LLVMException {
+		try {
+			return new Value(LLVMGetFirstFunction(this.module));
+		} catch (IllegalArgumentException e) {
+			throw new LLVMException(
+					"The module does not declare any functions.");
+		}
 	}
 
 	/**
-	 * Obtain an iterator to the last Function in a Module.<br>
+	 * Obtain an iterator to the last Function in a Module.
 	 * 
 	 * @see llvm::Module::end()
 	 */
-	public Value getLastFunction() {
-		return new Value(LLVMGetLastFunction(this.module));
+	public Value getLastFunction() throws LLVMException {
+		try {
+			return new Value(LLVMGetLastFunction(this.module));
+		} catch (IllegalArgumentException e) {
+			throw new LLVMException(
+					"The module does not declare any functions.");
+		}
 	}
 
 }

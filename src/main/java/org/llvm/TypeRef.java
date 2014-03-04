@@ -1,74 +1,13 @@
 package org.llvm;
 
-import static org.llvm.binding.LLVMLibrary.LLVMAlignOf;
-import static org.llvm.binding.LLVMLibrary.LLVMArrayType;
-import static org.llvm.binding.LLVMLibrary.LLVMConstAllOnes;
-import static org.llvm.binding.LLVMLibrary.LLVMConstInt;
-import static org.llvm.binding.LLVMLibrary.LLVMConstIntOfArbitraryPrecision;
-import static org.llvm.binding.LLVMLibrary.LLVMConstIntOfString;
-import static org.llvm.binding.LLVMLibrary.LLVMConstIntOfStringAndSize;
-import static org.llvm.binding.LLVMLibrary.LLVMConstNull;
-import static org.llvm.binding.LLVMLibrary.LLVMConstPointerNull;
-import static org.llvm.binding.LLVMLibrary.LLVMConstReal;
-import static org.llvm.binding.LLVMLibrary.LLVMConstRealOfString;
-import static org.llvm.binding.LLVMLibrary.LLVMConstRealOfStringAndSize;
-import static org.llvm.binding.LLVMLibrary.LLVMCountParamTypes;
-import static org.llvm.binding.LLVMLibrary.LLVMCountStructElementTypes;
-import static org.llvm.binding.LLVMLibrary.LLVMDoubleType;
-import static org.llvm.binding.LLVMLibrary.LLVMDoubleTypeInContext;
-import static org.llvm.binding.LLVMLibrary.LLVMFP128Type;
-import static org.llvm.binding.LLVMLibrary.LLVMFP128TypeInContext;
-import static org.llvm.binding.LLVMLibrary.LLVMFloatType;
-import static org.llvm.binding.LLVMLibrary.LLVMFloatTypeInContext;
-import static org.llvm.binding.LLVMLibrary.LLVMFunctionType;
-import static org.llvm.binding.LLVMLibrary.LLVMGetArrayLength;
-import static org.llvm.binding.LLVMLibrary.LLVMGetElementType;
-import static org.llvm.binding.LLVMLibrary.LLVMGetGlobalContext;
-import static org.llvm.binding.LLVMLibrary.LLVMGetIntTypeWidth;
-import static org.llvm.binding.LLVMLibrary.LLVMGetParamTypes;
-import static org.llvm.binding.LLVMLibrary.LLVMGetPointerAddressSpace;
-import static org.llvm.binding.LLVMLibrary.LLVMGetReturnType;
-import static org.llvm.binding.LLVMLibrary.LLVMGetStructElementTypes;
-import static org.llvm.binding.LLVMLibrary.LLVMGetTypeContext;
-import static org.llvm.binding.LLVMLibrary.LLVMGetTypeKind;
-import static org.llvm.binding.LLVMLibrary.LLVMGetUndef;
-import static org.llvm.binding.LLVMLibrary.LLVMGetVectorSize;
-import static org.llvm.binding.LLVMLibrary.LLVMInt16Type;
-import static org.llvm.binding.LLVMLibrary.LLVMInt16TypeInContext;
-import static org.llvm.binding.LLVMLibrary.LLVMInt1Type;
-import static org.llvm.binding.LLVMLibrary.LLVMInt1TypeInContext;
-import static org.llvm.binding.LLVMLibrary.LLVMInt32Type;
-import static org.llvm.binding.LLVMLibrary.LLVMInt32TypeInContext;
-import static org.llvm.binding.LLVMLibrary.LLVMInt64Type;
-import static org.llvm.binding.LLVMLibrary.LLVMInt64TypeInContext;
-import static org.llvm.binding.LLVMLibrary.LLVMInt8Type;
-import static org.llvm.binding.LLVMLibrary.LLVMInt8TypeInContext;
-import static org.llvm.binding.LLVMLibrary.LLVMIntType;
-import static org.llvm.binding.LLVMLibrary.LLVMIntTypeInContext;
-import static org.llvm.binding.LLVMLibrary.LLVMIsFunctionVarArg;
-import static org.llvm.binding.LLVMLibrary.LLVMIsOpaqueStruct;
-import static org.llvm.binding.LLVMLibrary.LLVMIsPackedStruct;
-import static org.llvm.binding.LLVMLibrary.LLVMLabelType;
-import static org.llvm.binding.LLVMLibrary.LLVMLabelTypeInContext;
-import static org.llvm.binding.LLVMLibrary.LLVMPPCFP128Type;
-import static org.llvm.binding.LLVMLibrary.LLVMPPCFP128TypeInContext;
-import static org.llvm.binding.LLVMLibrary.LLVMPointerType;
-import static org.llvm.binding.LLVMLibrary.LLVMSizeOf;
-import static org.llvm.binding.LLVMLibrary.LLVMStructCreateNamed;
-import static org.llvm.binding.LLVMLibrary.LLVMStructType;
-import static org.llvm.binding.LLVMLibrary.LLVMStructTypeInContext;
-import static org.llvm.binding.LLVMLibrary.LLVMVectorType;
-import static org.llvm.binding.LLVMLibrary.LLVMVoidType;
-import static org.llvm.binding.LLVMLibrary.LLVMVoidTypeInContext;
-import static org.llvm.binding.LLVMLibrary.LLVMX86FP80Type;
-import static org.llvm.binding.LLVMLibrary.LLVMX86FP80TypeInContext;
-import static org.llvm.binding.LLVMLibrary.LLVMX86MMXType;
-import static org.llvm.binding.LLVMLibrary.LLVMX86MMXTypeInContext;
-
 import org.bridj.IntValuedEnum;
 import org.bridj.Pointer;
 import org.llvm.binding.LLVMLibrary.LLVMTypeKind;
 import org.llvm.binding.LLVMLibrary.LLVMTypeRef;
+
+import java.util.List;
+
+import static org.llvm.binding.LLVMLibrary.*;
 
 /**
  * Each value in the LLVM IR has a type, an LLVMTypeRef.
@@ -86,18 +25,14 @@ public class TypeRef {
 	}
 
 	/**
-	 * Obtain the enumerated type of a Type instance.<br>
-	 * 
-	 * @see llvm::Type:getTypeID()
+	 * Obtain the enumerated type of a Type instance.
 	 */
 	public IntValuedEnum<LLVMTypeKind> getTypeKind() {
 		return LLVMGetTypeKind(this.type);
 	}
 
 	/**
-	 * Obtain the context to which this type instance is associated.<br>
-	 * 
-	 * @see llvm::Type::getContext()
+	 * Obtain the context to which this type instance is associated.
 	 */
 	public Context getTypeContext() {
 		return new Context(LLVMGetTypeContext(this.type));
@@ -223,22 +158,22 @@ public class TypeRef {
 	 * The function is defined as a tuple of a return Type, a list of<br>
 	 * parameter types, and whether the function is variadic.
 	 */
-	public static TypeRef functionType(LLVMTypeRef returnType,
-			Pointer<LLVMTypeRef> paramTypes, int paramCount, int isVarArg) {
-		return new TypeRef(LLVMFunctionType(returnType, paramTypes, paramCount,
-				isVarArg));
-	}
-
 	public static TypeRef functionType(TypeRef returnType,
 			TypeRef... paramTypes) {
 		return new TypeRef(LLVMFunctionType(returnType.type,
 				internalize(paramTypes), paramTypes.length, 0));
 	}
 
-	public static TypeRef functionType(TypeRef returnType, boolean isVarArg,
-			TypeRef... paramTypes) {
+	public static TypeRef functionType(TypeRef returnType,
+			List<TypeRef> paramTypes) {
 		return new TypeRef(LLVMFunctionType(returnType.type,
-				internalize(paramTypes), paramTypes.length, isVarArg ? 1 : 0));
+				internalize(paramTypes), paramTypes.size(), 0));
+	}
+
+	public static TypeRef functionType(TypeRef returnType, boolean isVarArg,
+			List<TypeRef> paramTypes) {
+		return new TypeRef(LLVMFunctionType(returnType.type,
+				internalize(paramTypes), paramTypes.size(), isVarArg ? 1 : 0));
 	}
 
 	/**
@@ -272,6 +207,7 @@ public class TypeRef {
 	 * @param dest
 	 *        Memory address of an array to be filled with result.
 	 */
+	// TODO Pointer
 	public void getParamTypes(Pointer<LLVMTypeRef> dest) {
 		LLVMGetParamTypes(this.type, dest);
 	}
@@ -279,10 +215,9 @@ public class TypeRef {
 	/**
 	 * Create a new structure type in a context.<br>
 	 * A structure is specified by a list of inner elements/types and<br>
-	 * whether these can be packed together.<br>
-	 * 
-	 * @see llvm::StructType::create()
+	 * whether these can be packed together.
 	 */
+	// TODO Pointer
 	public static TypeRef structTypeInContext(Context c,
 			Pointer<LLVMTypeRef> elementTypes, int elementCount, boolean packed) {
 		return new TypeRef(LLVMStructTypeInContext(c.context(), elementTypes,
@@ -290,10 +225,9 @@ public class TypeRef {
 	}
 
 	/**
-	 * Create a new structure type in the global context.<br>
-	 * 
-	 * @see llvm::StructType::create()
+	 * Create a new structure type in the global context.
 	 */
+	// TODO Pointer
 	public static TypeRef structType(Pointer<LLVMTypeRef> elementTypes,
 			int elementCount, boolean packed) {
 		return new TypeRef(
@@ -303,9 +237,9 @@ public class TypeRef {
 	/**
 	 * Create a new non-packed structure type in the global context.
 	 */
-	public static TypeRef structType(TypeRef... elementTypes) {
+	public static TypeRef structType(List<TypeRef> elementTypes) {
 		return new TypeRef(LLVMStructType(internalize(elementTypes),
-				elementTypes.length, 0));
+				elementTypes.size(), 0));
 	}
 
 	/**
@@ -313,7 +247,7 @@ public class TypeRef {
 	 */
 	public static TypeRef structTypeNamed(String name) {
 		return new TypeRef(LLVMStructCreateNamed(LLVMGetGlobalContext(),
-				Pointer.pointerToCString(name == null ? "" : name)));
+				Pointer.pointerToCString(name)));
 	}
 
 	/**
@@ -321,13 +255,20 @@ public class TypeRef {
 	 */
 	public static TypeRef structTypeNamed(Context c, String name) {
 		return new TypeRef(LLVMStructCreateNamed(c.context(),
-				Pointer.pointerToCString(name == null ? "" : name)));
+				Pointer.pointerToCString(name)));
 	}
 
 	/**
-	 * Get the number of elements defined inside the structure.<br>
-	 * 
-	 * @see llvm::StructType::getNumElements()
+	 * Set the contents of a structure type.
+	 */
+	public static void structSetBody(TypeRef struct, List<TypeRef> types,
+			boolean packed) {
+		LLVMStructSetBody(struct.type, internalize(types), types.size(),
+				packed ? 1 : 0);
+	}
+
+	/**
+	 * Get the number of elements defined inside the structure.
 	 */
 	public int countStructElementTypes() {
 		return LLVMCountStructElementTypes(this.type);
@@ -342,23 +283,20 @@ public class TypeRef {
 	 * of the structure type itself, which is the lifetime of the context it<br>
 	 * is contained in.
 	 */
+	// TODO Pointer
 	public void getStructElementTypes(Pointer<LLVMTypeRef> dest) {
 		LLVMGetStructElementTypes(this.type, dest);
 	}
 
 	/**
-	 * Determine whether a structure is packed.<br>
-	 * 
-	 * @see llvm::StructType::isPacked()
+	 * Determine whether a structure is packed.
 	 */
 	public boolean isPackedStruct() {
 		return LLVMIsPackedStruct(this.type) != 0;
 	}
 
 	/**
-	 * Determine whether a structure is opaque.<br>
-	 * 
-	 * @see llvm::StructType::isOpaque()<br>
+	 * Determine whether a structure is opaque.
 	 */
 	public boolean isOpaqueStruct() {
 		return LLVMIsOpaqueStruct(this.type) != 0;
@@ -367,9 +305,7 @@ public class TypeRef {
 	/**
 	 * Create a fixed size array type that refers to a specific type.<br>
 	 * The created type will exist in the context that its element type<br>
-	 * exists in.<br>
-	 * 
-	 * @see llvm::ArrayType::get()
+	 * exists in.
 	 */
 	public TypeRef arrayType(int elementCount) {
 		return new TypeRef(LLVMArrayType(this.type, elementCount));
@@ -378,9 +314,7 @@ public class TypeRef {
 	/**
 	 * Create a pointer type that points to a defined type.<br>
 	 * The created type will exist in the context that its pointee type<br>
-	 * exists in.<br>
-	 * 
-	 * @see llvm::PointerType::get()
+	 * exists in.
 	 */
 	public TypeRef pointerType(int addressSpace) {
 		return new TypeRef(LLVMPointerType(this.type, addressSpace));
@@ -389,9 +323,7 @@ public class TypeRef {
 	/**
 	 * Create a pointer type that points to a defined type.<br>
 	 * The created type will exist in the context that its pointee type<br>
-	 * exists in and the default address space (0).<br>
-	 * 
-	 * @see llvm::PointerType::get()
+	 * exists in and the default address space (0).
 	 */
 	public TypeRef pointerType() {
 		return new TypeRef(LLVMPointerType(this.type, 0));
@@ -401,9 +333,7 @@ public class TypeRef {
 	 * Create a vector type that contains a defined type and has a specific<br>
 	 * number of elements.<br>
 	 * The created type will exist in the context thats its element type<br>
-	 * exists in.<br>
-	 * 
-	 * @see llvm::VectorType::get()
+	 * exists in.
 	 */
 	public TypeRef vectorType(int elementCount) {
 		return new TypeRef(LLVMVectorType(this.type, elementCount));
@@ -411,9 +341,7 @@ public class TypeRef {
 
 	/**
 	 * Obtain the type of elements within a sequential type.<br>
-	 * This works on array, vector, and pointer types.<br>
-	 * 
-	 * @see llvm::SequentialType::getElementType()
+	 * This works on array, vector, and pointer types.
 	 */
 	public TypeRef getElementType() {
 		return new TypeRef(LLVMGetElementType(this.type));
@@ -421,9 +349,7 @@ public class TypeRef {
 
 	/**
 	 * Obtain the length of an array type.<br>
-	 * This only works on types that represent arrays.<br>
-	 * 
-	 * @see llvm::ArrayType::getNumElements()
+	 * This only works on types that represent arrays.
 	 */
 	public int getArrayLength() {
 		return LLVMGetArrayLength(this.type);
@@ -431,9 +357,7 @@ public class TypeRef {
 
 	/**
 	 * Obtain the address space of a pointer type.<br>
-	 * This only works on types that represent pointers.<br>
-	 * 
-	 * @see llvm::PointerType::getAddressSpace()
+	 * This only works on types that represent pointers.
 	 */
 	public int getPointerAddressSpace() {
 		return LLVMGetPointerAddressSpace(this.type);
@@ -441,9 +365,7 @@ public class TypeRef {
 
 	/**
 	 * Obtain the number of elements in a vector type.<br>
-	 * This only works on types that represent vectors.<br>
-	 * 
-	 * @see llvm::VectorType::getNumElements()
+	 * This only works on types that represent vectors.
 	 */
 	public int getVectorSize() {
 		return LLVMGetVectorSize(this.type);
@@ -500,9 +422,7 @@ public class TypeRef {
 	//public static void    disposeTypeHandle(LLVMTypeHandleRef TypeHandle);
 
 	/**
-	 * Obtain a constant value referring to the null instance of a type.<br>
-	 * 
-	 * @see llvm::Constant::getNullValue()
+	 * Obtain a constant value referring to the null instance of a type.
 	 */
 	public Value constNull() {
 		return new Value(LLVMConstNull(this.type));
@@ -519,17 +439,14 @@ public class TypeRef {
 	/**
 	 * Obtain a constant value referring to the instance of a type<br>
 	 * consisting of all ones.<br>
-	 * This is only valid for integer types.<br>
-	 * * @see llvm::Constant::getAllOnesValue()
+	 * This is only valid for integer types.
 	 */
 	public Value constAllOnes() {
 		return new Value(LLVMConstAllOnes(this.type));
 	}
 
 	/**
-	 * Obtain a constant value referring to an undefined value of a type.<br>
-	 * 
-	 * @see llvm::UndefValue::get()
+	 * Obtain a constant value referring to an undefined value of a type.
 	 */
 	public Value getUndef() {
 		return new Value(LLVMGetUndef(this.type));
@@ -537,9 +454,8 @@ public class TypeRef {
 
 	/**
 	 * Obtain a constant value for an integer type.<br>
-	 * The returned value corresponds to a llvm::ConstantInt.<br>
+	 * The returned value corresponds to a org.llvm::ConstantInt.<br>
 	 * 
-	 * @see llvm::ConstantInt::get()<br>
 	 * @param n
 	 *        The value the returned instance should refer to.<br>
 	 * @param signExtend
@@ -550,23 +466,19 @@ public class TypeRef {
 	}
 
 	/**
-	 * Obtain a constant value for an integer of arbitrary precision.<br>
-	 * 
-	 * @see llvm::ConstantInt::get()
+	 * Obtain a constant value for an integer of arbitrary precision.
 	 */
 	// TODO: change Pointer to array
 	public Value constIntOfArbitraryPrecision(int numWords, Pointer<Long> words) {
-		return new Value(
-				LLVMConstIntOfArbitraryPrecision(this.type, numWords, words));
+		return new Value(LLVMConstIntOfArbitraryPrecision(this.type, numWords,
+				words));
 	}
 
 	/**
 	 * Obtain a constant value for an integer parsed from a string.<br>
 	 * A similar API, LLVMConstIntOfStringAndSize is also available. If the<br>
 	 * string's length is available, it is preferred to call that function<br>
-	 * instead.<br>
-	 * 
-	 * @see llvm::ConstantInt::get()
+	 * instead.
 	 */
 	public Value constIntOfString(String text, byte radix) {
 		return new Value(LLVMConstIntOfString(this.type,
@@ -575,9 +487,7 @@ public class TypeRef {
 
 	/**
 	 * Obtain a constant value for an integer parsed from a string with<br>
-	 * specified length.<br>
-	 * 
-	 * @see llvm::ConstantInt::get()
+	 * specified length.
 	 */
 	public Value constIntOfStringAndSize(String text, int sLen, byte radix) {
 		return new Value(LLVMConstIntOfStringAndSize(this.type,
@@ -617,7 +527,7 @@ public class TypeRef {
 		return new Value(LLVMSizeOf(this.type));
 	}
 
-	static Pointer<LLVMTypeRef> internalize(TypeRef[] types) {
+	public static Pointer<LLVMTypeRef> internalize(TypeRef... types) {
 		int n = types.length;
 		LLVMTypeRef[] inner = new LLVMTypeRef[n];
 		for (int i = 0; i < n; i++) {
@@ -626,6 +536,26 @@ public class TypeRef {
 
 		Pointer<LLVMTypeRef> array = Pointer.allocateTypedPointers(
 				LLVMTypeRef.class, types.length);
+		if (array == null) {
+			return null;
+		}
+		array.setArray(inner);
+
+		return array;
+	}
+
+	public static Pointer<LLVMTypeRef> internalize(List<TypeRef> types) {
+		int n = types.size();
+		LLVMTypeRef[] inner = new LLVMTypeRef[n];
+		for (int i = 0; i < n; i++) {
+			inner[i] = types.get(i).type;
+		}
+
+		Pointer<LLVMTypeRef> array = Pointer.allocateTypedPointers(
+				LLVMTypeRef.class, types.size());
+		if (array == null) {
+			return null;
+		}
 		array.setArray(inner);
 
 		return array;

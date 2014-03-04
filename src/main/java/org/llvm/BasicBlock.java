@@ -22,48 +22,46 @@ import org.llvm.binding.LLVMLibrary.LLVMBasicBlockRef;
 public class BasicBlock {
 	private final LLVMBasicBlockRef bb;
 
-	LLVMBasicBlockRef bb() {
+	public LLVMBasicBlockRef bb() {
 		return this.bb;
 	}
 
-	BasicBlock(LLVMBasicBlockRef bb) {
+	public BasicBlock(LLVMBasicBlockRef bb) {
 		this.bb = bb;
 	}
 
 	/**
 	 * Convert a basic block instance to a value type.
 	 */
-	public Value basicBlockAsValue() {
+	public Value asValue() {
 		return new Value(LLVMBasicBlockAsValue(this.bb));
 	}
 
 	/**
-	 * Obtain the function to which a basic block belongs.<br>
-	 * 
-	 * @see llvm::BasicBlock::getParent()
+	 * Obtain the function to which a basic block belongs.
 	 */
-	public Value getBasicBlockParent() {
+	public Value getParent() {
 		return new Value(LLVMGetBasicBlockParent(this.bb));
 	}
 
 	/**
 	 * Advance a basic block iterator.
 	 */
-	public BasicBlock getNextBasicBlock() {
+	public BasicBlock getNext() {
 		return new BasicBlock(LLVMGetNextBasicBlock(this.bb));
 	}
 
 	/**
 	 * Go backwards in a basic block iterator.
 	 */
-	public BasicBlock getPreviousBasicBlock() {
+	public BasicBlock getPrevious() {
 		return new BasicBlock(LLVMGetPreviousBasicBlock(this.bb));
 	}
 
 	/**
 	 * Insert a new basic block before this basic block, and return it.
 	 */
-	public BasicBlock insertBasicBlock(String name) {
+	public BasicBlock insert(String name) {
 		return new BasicBlock(LLVMInsertBasicBlock(this.bb,
 				Pointer.pointerToCString(name)));
 	}
@@ -71,37 +69,31 @@ public class BasicBlock {
 	/**
 	 * Insert a new basic block before this basic block, and return it
 	 */
-	public BasicBlock InsertBasicBlockInContext(Context c, String name) {
-		return new BasicBlock(LLVMInsertBasicBlockInContext(c.context(), this.bb,
-				Pointer.pointerToCString(name)));
+	public BasicBlock insertInContext(Context c, String name) {
+		return new BasicBlock(LLVMInsertBasicBlockInContext(c.context(),
+				this.bb, Pointer.pointerToCString(name)));
 	}
 
 	/**
 	 * Remove a basic block from a function and delete it.<br>
 	 * This deletes the basic block from its containing function and deletes<br>
-	 * the basic block itself.<br>
-	 * 
-	 * @see llvm::BasicBlock::eraseFromParent()
+	 * the basic block itself.
 	 */
-	public void deleteBasicBlock() {
+	public void delete() {
 		LLVMDeleteBasicBlock(this.bb);
 	}
 
 	/**
-	 * Move a basic block to before another one.<br>
-	 * 
-	 * @see llvm::BasicBlock::moveBefore()
+	 * Move a basic block to before another one.
 	 */
-	public void moveBasicBlockBefore(BasicBlock movePos) {
+	public void moveBefore(BasicBlock movePos) {
 		LLVMMoveBasicBlockBefore(this.bb, movePos.bb());
 	}
 
 	/**
-	 * Move a basic block to after another one.<br>
-	 * 
-	 * @see llvm::BasicBlock::moveAfter()
+	 * Move a basic block to after another one.
 	 */
-	public void moveBasicBlockAfter(BasicBlock movePos) {
+	public void moveAfter(BasicBlock movePos) {
 		LLVMMoveBasicBlockAfter(this.bb, movePos.bb());
 	}
 

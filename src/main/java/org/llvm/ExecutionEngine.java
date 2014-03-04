@@ -121,8 +121,8 @@ public class ExecutionEngine {
 	public GenericValue runFunction(Value f, GenericValue... args) {
 		// Pointer<Pointer<LLVMOpaqueGenericValue>> args) {
 
-		return new GenericValue(LLVMRunFunction(this.engine, f.value(), args.length,
-				internalize(args)));
+		return new GenericValue(LLVMRunFunction(this.engine, f.value(),
+				args.length, internalize(args)));
 	}
 
 	public void freeMachineCodeForFunction(Value f) {
@@ -145,7 +145,8 @@ public class ExecutionEngine {
 		Pointer<Pointer<Byte>> outError = Pointer.allocateBytes(1, 1024);
 		Pointer<LLVMModuleRef> outMod = Pointer
 				.allocateTypedPointer(LLVMModuleRef.class);
-		boolean err = LLVMRemoveModule(this.engine, m.module(), outMod, outError) != 0;
+		boolean err = LLVMRemoveModule(this.engine, m.module(), outMod,
+				outError) != 0;
 		if (err) {
 			String msg = outError.get().getCString();
 			throw new RuntimeException("can't remove module: " + msg);
@@ -158,7 +159,8 @@ public class ExecutionEngine {
 		Pointer<Pointer<Byte>> outError = Pointer.allocateBytes(1, 1024);
 		Pointer<LLVMModuleRef> outMod = Pointer
 				.allocateTypedPointer(LLVMModuleRef.class);
-		boolean err = LLVMRemoveModuleProvider(this.engine, mp, outMod, outError) != 0;
+		boolean err = LLVMRemoveModuleProvider(this.engine, mp, outMod,
+				outError) != 0;
 		if (err) {
 			String msg = outError.get().getCString();
 			throw new RuntimeException("can't remove module provider: " + msg);
@@ -187,7 +189,8 @@ public class ExecutionEngine {
 	}
 
 	public void addTargetData(PassManager manager) {
-		LLVMAddTargetData(this.getExecutionEngineTargetData(), manager.manager());
+		LLVMAddTargetData(this.getExecutionEngineTargetData(),
+				manager.manager());
 	}
 
 	public void addGlobalMapping(Value global, Pointer<?> addr) {
@@ -207,6 +210,9 @@ public class ExecutionEngine {
 
 		Pointer<LLVMGenericValueRef> array = Pointer.allocateTypedPointers(
 				LLVMGenericValueRef.class, n);
+		if (array == null) {
+			return null;
+		}
 		array.setArray(inner);
 
 		return array;

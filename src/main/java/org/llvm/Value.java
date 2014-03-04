@@ -15,6 +15,8 @@ import org.llvm.binding.LLVMLibrary.LLVMUseRef;
 import org.llvm.binding.LLVMLibrary.LLVMValueRef;
 import org.llvm.binding.LLVMLibrary.LLVMVisibility;
 
+import java.util.List;
+
 /**
  * Represents an individual value in LLVM IR.
  */
@@ -22,11 +24,11 @@ public class Value {
 
 	private final LLVMValueRef value;
 
-	LLVMValueRef value() {
+	public LLVMValueRef value() {
 		return this.value;
 	}
 
-	Value(LLVMValueRef value) {
+	public Value(LLVMValueRef value) {
 		this.value = value;
 	}
 
@@ -493,9 +495,13 @@ public class Value {
 	 * @see llvm::ConstantDataArray::getString()
 	 */
 	public static Value constString(String str, int length,
-			boolean dontNullTerminate) {
+			boolean dontNulTerminate) {
 		return new Value(LLVMConstString(Pointer.pointerToCString(str), length,
-				dontNullTerminate ? 1 : 0));
+				dontNulTerminate ? 1 : 0));
+	}
+
+	public static Value constString(String str) {
+		return constString(str, str.length(), false);
 	}
 
 	/**
@@ -503,10 +509,9 @@ public class Value {
 	 * 
 	 * @see llvm::ConstantArray::get()
 	 */
-	// TODO: change Pointer to array
-	public static Value constArray(TypeRef elementTy,
-			Pointer<LLVMValueRef> constantVals, int length) {
-		return new Value(LLVMConstArray(elementTy.type(), constantVals, length));
+	public static Value constArray(TypeRef elementTy, List<Value> constantVals) {
+		return new Value(LLVMConstArray(elementTy.type(),
+				internalize(constantVals), constantVals.size()));
 	}
 
 	/**
@@ -516,6 +521,7 @@ public class Value {
 	 * 
 	 * @see LLVMConstStructInContext()
 	 */
+	// TODO: change Pointer to array
 	public static Value constStruct(Pointer<LLVMValueRef> constantVals,
 			int count, boolean packed) {
 		return new Value(LLVMConstStruct(constantVals, count, packed ? 1 : 0));
@@ -527,6 +533,15 @@ public class Value {
 	public static Value constStruct(Value... constantVals) {
 		return new Value(LLVMConstStruct(internalize(constantVals),
 				constantVals.length, 0));
+	}
+
+	/**
+	 * Create a non-anonymous ConstantStruct from values.
+	 */
+	public static Value constNamedStruct(TypeRef structType,
+			Value... constantVals) {
+		return new Value(LLVMConstNamedStruct(structType.type(),
+				internalize(constantVals), constantVals.length));
 	}
 
 	/**
@@ -693,11 +708,20 @@ public class Value {
 				LLVMConstAShr(lhsConstant.value(), rhsConstant.value()));
 	}
 
-	// TODO: fix Pointer (change to array)
-	public static Value constGEP(Value constantVal,
-			Pointer<LLVMValueRef> constantIndices, int numIndices) {
-		return new Value(LLVMConstGEP(constantVal.value(), constantIndices,
-				numIndices));
+	public static Value constGEP(Value constantVal, List<Integer> indices) {
+		Pointer ptrIndices = Pointer.allocateTypedPointers(LLVMValueRef.class,
+				indices.size());
+
+		int i = 0;
+		for (Integer index : indices) {
+			LLVMValueRef valueRef = TypeRef.int32Type().constInt(index, false)
+					.value();
+			ptrIndices.set(i, valueRef);
+			i++;
+		}
+
+		return new Value(LLVMConstGEP(constantVal.value(), ptrIndices,
+				indices.size()));
 	}
 
 	public static Value constInBoundsGEP(Value constantVal,
@@ -1203,8 +1227,8 @@ public class Value {
 	 * @see llvm::BasicBlock::Create()
 	 */
 	public BasicBlock appendBasicBlockInContext(Context c, String name) {
-		return new BasicBlock(LLVMAppendBasicBlockInContext(c.context(), this.value,
-				Pointer.pointerToCString(name)));
+		return new BasicBlock(LLVMAppendBasicBlockInContext(c.context(),
+				this.value, Pointer.pointerToCString(name)));
 	}
 
 	/**
@@ -1251,10 +1275,7 @@ public class Value {
 	/**
 	 * Set the calling convention for a call instruction.<br>
 	 * This expects an LLVMValueRef that corresponds to a llvm::CallInst or<br>
-	 * llvm::InvokeInst.<br>
-	 * 
-	 * @see llvm::CallInst::setCallingConv()<br>
-	 * @see llvm::InvokeInst::setCallingConv()
+	 * llvm::InvokeInst.
 	 */
 	public void setInstructionCallConv(int cc) {
 		LLVMSetInstructionCallConv(this.value, cc);
@@ -1263,9 +1284,7 @@ public class Value {
 	/**
 	 * Obtain the calling convention for a call instruction.<br>
 	 * This is the opposite of LLVMSetInstructionCallConv(). Reads its<br>
-	 * usage.<br>
-	 * 
-	 * @see LLVMSetInstructionCallConv()
+	 * usage.
 	 */
 	public int getInstructionCallConv() {
 		return LLVMGetInstructionCallConv(this.value);
@@ -1308,8 +1327,6 @@ public class Value {
 	/**
 	 * Add an incoming value to the end of a PHI list.
 	 */
-	/* public void AddIncoming(Pointer<LLVMValueRef> IncomingValues,
-	 * Pointer<LLVMBasicBlockRef > IncomingBlocks, int Count) { */
 	public void addIncoming(Value[] incomingValues,
 			BasicBlock[] incomingBlocks, int count) {
 
@@ -1327,6 +1344,14 @@ public class Value {
 				.pointerToArray(rawBlocks);
 
 		LLVMAddIncoming(this.value, ptrVals, ptrBlocks, count);
+	}
+
+	public void addClause(Value clauseValue) {
+		LLVMAddClause(this.value, clauseValue.value);
+	}
+
+	public void setCleanup(boolean value) {
+		LLVMSetCleanup(this.value, value ? 1 : 0);
 	}
 
 	/**
@@ -1359,6 +1384,26 @@ public class Value {
 
 		Pointer<LLVMValueRef> array = Pointer.allocateTypedPointers(
 				LLVMValueRef.class, values.length);
+		if (array == null) {
+			return null;
+		}
+		array.setArray(inner);
+
+		return array;
+	}
+
+	static Pointer<LLVMValueRef> internalize(List<Value> values) {
+		int n = values.size();
+		LLVMValueRef[] inner = new LLVMValueRef[n];
+		for (int i = 0; i < n; i++) {
+			inner[i] = values.get(i).value;
+		}
+
+		Pointer<LLVMValueRef> array = Pointer.allocateTypedPointers(
+				LLVMValueRef.class, values.size());
+		if (array == null) {
+			return null;
+		}
 		array.setArray(inner);
 
 		return array;
