@@ -4,3 +4,5 @@
 target/
 
 jnaerator.jar
+src/main/java/org/llvm/binding/LLVMLibrary.java
+src/main/java/org/llvm/binding/LLVMMCJITCompilerOptions.java
