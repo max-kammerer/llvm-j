@@ -283,9 +283,19 @@ public class TypeRef {
 	 * of the structure type itself, which is the lifetime of the context it<br>
 	 * is contained in.
 	 */
-	// TODO Pointer
-	public void getStructElementTypes(Pointer<LLVMTypeRef> dest) {
+	public TypeRef [] getStructElementTypes() {
+        int n = countStructElementTypes();
+        Pointer<LLVMTypeRef> dest = Pointer.allocateTypedPointers(
+            LLVMTypeRef.class, n);
+        
 		LLVMGetStructElementTypes(this.type, dest);
+        
+        TypeRef [] res = new TypeRef[n];
+        int i = 0;
+        for (LLVMTypeRef t : dest) {
+            res[i++] = new TypeRef(t);
+        }
+        return res;
 	}
 
 	/**
