@@ -533,7 +533,7 @@ public class TypeRef {
 		return new Value(LLVMAlignOf(this.type));
 	}
 
-	public Value sizeOf(TypeRef ty) {
+	public Value sizeOf() {
 		return new Value(LLVMSizeOf(this.type));
 	}
 
