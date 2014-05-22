@@ -264,4 +264,8 @@ public class Module {
 		}
 	}
 
+    public void addNamedMetaData(String name, Value metadata) {
+        LLVMAddNamedMetadataOperand(this.module, Pointer.pointerToCString(name), 
+            metadata.value());
+    }
 }

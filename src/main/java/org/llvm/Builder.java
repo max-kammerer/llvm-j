@@ -586,4 +586,7 @@ public class Builder {
 		return new Value(LLVMBuildResume(this.builder, exn.value()));
 	}
 
+    public void setCurrentDebugLoc(Value debug) {
+        LLVMSetCurrentDebugLocation(this.builder, debug.value());
+    }
 }
