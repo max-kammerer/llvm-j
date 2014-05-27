@@ -549,10 +549,8 @@ public class Value {
 	 * 
 	 * @see llvm::ConstantVector::get()
 	 */
-	// TODO: change Pointer to array
-	public static Value constVector(Pointer<LLVMValueRef> scalarConstantVals,
-			int size) {
-		return new Value(LLVMConstVector(scalarConstantVals, size));
+	public static Value constVector(Value [] scalarConstantVals) {
+		return new Value(LLVMConstVector(internalize(scalarConstantVals), scalarConstantVals.length));
 	}
 
 	public static native IntValuedEnum<LLVMOpcode> GetConstOpcode(
