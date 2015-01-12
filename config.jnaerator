@@ -5,11 +5,11 @@
 -mode Directory
 -package org.llvm.binding
 -o $(DIR)/src/main/java
--I$(LLVM_HOME)/include/llvm-c/
+-I$(LLVM_C)
 
-$(LLVM_HOME)/include/llvm-c/Analysis.h
-$(LLVM_HOME)/include/llvm-c/BitWriter.h
-$(LLVM_HOME)/include/llvm-c/ExecutionEngine.h
-$(LLVM_HOME)/include/llvm-c/Core.h
-$(LLVM_HOME)/include/llvm-c/Target.h
-$(LLVM_HOME)/include/llvm-c/Transforms/*.h
+$(LLVM_C)/Analysis.h
+$(LLVM_C)/BitWriter.h
+$(LLVM_C)/ExecutionEngine.h
+$(LLVM_C)/Core.h
+$(LLVM_C)/Target.h
+$(LLVM_C)/Transforms/*.h
