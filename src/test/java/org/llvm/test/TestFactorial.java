@@ -64,7 +64,6 @@ public class TestFactorial extends TestCase {
 	}
 
 	public void testFactorial() {
-		ExecutionEngine.linkInJIT();
 		Target.initialiseNativeTarget();
 
 		Module module = Module.createWithName("fac_module");

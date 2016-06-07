@@ -17,7 +17,7 @@ import org.llvm.PassManager;
 
 public class TestLLVM extends TestCase {
 
-	private static final double LLVM_VERSION = 3.4;
+	private static final double LLVM_VERSION = 3.8;
 
 	public void testLLVMSymbols() {
 		NativeLibrary lib = null;
@@ -39,7 +39,7 @@ public class TestLLVM extends TestCase {
 		assertTrue(llvmSymbols.size() > 10);
 	}
 
-	public static void checkLLVM() {
+	public static void testCheckLLVM() {
 		Context ctx = Context.getGlobalContext();
 		assertNotNull(ctx);
 

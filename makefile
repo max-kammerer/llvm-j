@@ -1,6 +1,6 @@
 # Makefile for LLVM-J
 
-LLVM_VERSION=3.4
+LLVM_VERSION=3.8
 JNAERATOR_VERSION=0.12-SNAPSHOT-20130727
 
 # Path to LLVM such that headers for the C bindings exist

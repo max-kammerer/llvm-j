@@ -2,7 +2,6 @@ package org.llvm;
 
 import static org.llvm.binding.LLVMLibrary.LLVMAddGlobalMapping;
 import static org.llvm.binding.LLVMLibrary.LLVMAddModule;
-import static org.llvm.binding.LLVMLibrary.LLVMAddModuleProvider;
 import static org.llvm.binding.LLVMLibrary.LLVMAddTargetData;
 import static org.llvm.binding.LLVMLibrary.LLVMCreateExecutionEngineForModule;
 import static org.llvm.binding.LLVMLibrary.LLVMCreateJITCompilerForModule;
@@ -12,31 +11,22 @@ import static org.llvm.binding.LLVMLibrary.LLVMFindFunction;
 import static org.llvm.binding.LLVMLibrary.LLVMFreeMachineCodeForFunction;
 import static org.llvm.binding.LLVMLibrary.LLVMGetExecutionEngineTargetData;
 import static org.llvm.binding.LLVMLibrary.LLVMGetPointerToGlobal;
-import static org.llvm.binding.LLVMLibrary.LLVMLinkInJIT;
 import static org.llvm.binding.LLVMLibrary.LLVMRecompileAndRelinkFunction;
 import static org.llvm.binding.LLVMLibrary.LLVMRemoveModule;
-import static org.llvm.binding.LLVMLibrary.LLVMRemoveModuleProvider;
 import static org.llvm.binding.LLVMLibrary.LLVMRunFunction;
 import static org.llvm.binding.LLVMLibrary.LLVMRunFunctionAsMain;
 import static org.llvm.binding.LLVMLibrary.LLVMRunStaticConstructors;
 import static org.llvm.binding.LLVMLibrary.LLVMRunStaticDestructors;
 
 import org.bridj.Pointer;
-import org.llvm.binding.LLVMLibrary.LLVMExecutionEngineRef;
-import org.llvm.binding.LLVMLibrary.LLVMGenericValueRef;
-import org.llvm.binding.LLVMLibrary.LLVMModuleProviderRef;
-import org.llvm.binding.LLVMLibrary.LLVMModuleRef;
-import org.llvm.binding.LLVMLibrary.LLVMTargetDataRef;
-import org.llvm.binding.LLVMLibrary.LLVMValueRef;
+import org.llvm.binding.LLVMLibrary.*;
+
+import static org.llvm.binding.LLVMLibrary.*;
 
 /**
  * Implements various analyses of the LLVM IR.
  */
 public class ExecutionEngine {
-
-	public static void linkInJIT() {
-		LLVMLinkInJIT();
-	}
 
 	private final LLVMExecutionEngineRef engine;
 
@@ -133,14 +123,6 @@ public class ExecutionEngine {
 		LLVMAddModule(this.engine, m.module());
 	}
 
-	/**
-	 * @deprecated Use LLVMAddModule instead.
-	 */
-	@Deprecated
-	public void addModuleProvider(LLVMModuleProviderRef mp) {
-		LLVMAddModuleProvider(this.engine, mp);
-	}
-
 	public Module removeModule(Module m) {
 		Pointer<Pointer<Byte>> outError = Pointer.allocateBytes(1, 1024);
 		Pointer<LLVMModuleRef> outMod = Pointer
@@ -150,20 +132,6 @@ public class ExecutionEngine {
 		if (err) {
 			String msg = outError.get().getCString();
 			throw new RuntimeException("can't remove module: " + msg);
-		}
-		return new Module(outMod.get());
-	}
-
-	// TODO: make sure of this
-	public Module removeModuleProvider(LLVMModuleProviderRef mp) {
-		Pointer<Pointer<Byte>> outError = Pointer.allocateBytes(1, 1024);
-		Pointer<LLVMModuleRef> outMod = Pointer
-				.allocateTypedPointer(LLVMModuleRef.class);
-		boolean err = LLVMRemoveModuleProvider(this.engine, mp, outMod,
-				outError) != 0;
-		if (err) {
-			String msg = outError.get().getCString();
-			throw new RuntimeException("can't remove module provider: " + msg);
 		}
 		return new Module(outMod.get());
 	}

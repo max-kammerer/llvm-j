@@ -9,7 +9,7 @@ import org.bridj.ann.Library;
  * initialisation functions. Only a subset is declared here as to maintain
  * compatibility with future LLVM versions and non-standard compilation settings.
  */
-@Library("LLVM-3.4") 
+@Library("LLVM-3.8")
 public class LLVMTarget {
 	static {
 		BridJ.register();

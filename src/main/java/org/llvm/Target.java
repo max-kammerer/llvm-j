@@ -1,8 +1,6 @@
 package org.llvm;
 
-import static org.llvm.binding.LLVMTarget.LLVMInitializeX86Target;
-import static org.llvm.binding.LLVMTarget.LLVMInitializeX86TargetInfo;
-import static org.llvm.binding.LLVMTarget.LLVMInitializeX86TargetMC;
+import static org.llvm.binding.LLVMTarget.*;
 
 public class Target {
 	/**
@@ -12,6 +10,8 @@ public class Target {
 	 */
 	public static void initialiseNativeTarget() {
 		/* TODO For now let's assume that the host is always runnning x86. */
+		LLVMInitializeX86AsmPrinter();
+		LLVMInitializeX86AsmParser();
 		LLVMInitializeX86TargetInfo();
 		LLVMInitializeX86Target();
 		LLVMInitializeX86TargetMC();
