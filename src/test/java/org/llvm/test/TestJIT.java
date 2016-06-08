@@ -1,19 +1,11 @@
 package org.llvm.test;
 
-import junit.framework.TestCase;
-
-import org.llvm.BasicBlock;
-import org.llvm.Builder;
-import org.llvm.ExecutionEngine;
-import org.llvm.GenericValue;
-import org.llvm.Module;
-import org.llvm.TypeRef;
-import org.llvm.Value;
+import org.llvm.*;
 
 /**
  * http://www.mdevan.org/llvm-py/examples.html
  */
-public class TestJIT extends TestCase {
+public class TestJIT extends ExecutionTest {
 
 	public void testSimpleFn() {
 		Module mod = Module.createWithName("test_module");
@@ -39,19 +31,13 @@ public class TestJIT extends TestCase {
 				"tmp");
 		builder.buildRet(tmp);
 
-		// Show the assembly dump of this simple function
-		//mod.dumpModule();
-
-		// Create an execution engine.
-		ExecutionEngine ee = ExecutionEngine.createForModule(mod);
-
 		// The arguments need to be passed as "GenericValue" objects.
 		boolean SIGNED = true;
 		GenericValue arg1 = GenericValue.createInt(ty_i32, 2, SIGNED);
 		GenericValue arg2 = GenericValue.createInt(ty_i32, 40, SIGNED);
 
 		// Compile and run!
-		GenericValue retval = ee.runFunction(f_sum, arg1, arg2);
+		GenericValue retval = execute(mod, f_sum, arg1, arg2);
 
 		long retvalVal = retval.toInt(SIGNED);
 
